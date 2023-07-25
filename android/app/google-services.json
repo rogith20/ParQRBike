@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "763426755661",
+    "project_id": "parqr-bike-5e1eb",
+    "storage_bucket": "parqr-bike-5e1eb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763426755661:android:3f0b94ed3f42d78860f804",
+        "android_client_info": {
+          "package_name": "com.example.park_qr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763426755661-dn6dtuh6mcpf6jkn5hsc77tfkomo8c6q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.park_qr",
+            "certificate_hash": "a98d6d8612d44fb99bbe1e65c8d90b9a6f92ae87"
+          }
+        },
+        {
+          "client_id": "763426755661-o5671c83gkesdma3k90v5v4tn1uhuiqh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBp_93uE8mZqncTaIUCrGQuTnMNFNK1b8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763426755661-o5671c83gkesdma3k90v5v4tn1uhuiqh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
