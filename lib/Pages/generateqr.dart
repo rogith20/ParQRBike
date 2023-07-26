@@ -21,6 +21,22 @@ class _GenerateQRState extends State<GenerateQR> {
   TextEditingController vehicleController = TextEditingController();
   String? name;
 
+  bool isKeyboardOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Add a listener to the focus node of the text field.
+    // This will help to determine whether the keyboard is open or closed.
+    final focusNode = FocusNode();
+    focusNode.addListener(() {
+      setState(() {
+        isKeyboardOpen = focusNode.hasFocus;
+      });
+    });
+  }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -108,7 +124,7 @@ class _GenerateQRState extends State<GenerateQR> {
               currentFocus.unfocus();
             }
           },
-          child: Container(
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 if (selectedGridIndex == 0)
@@ -118,147 +134,160 @@ class _GenerateQRState extends State<GenerateQR> {
                 else if (selectedGridIndex == 2)
                   buildDepartmentDetailsWidget(),
                 if (WidgetsBinding.instance.window.viewInsets.bottom > 0.0)
-                  SizedBox(
-                    height: MediaQuery.of(context).viewInsets.bottom - 180,
-                  )
+                  SizedBox(height: getSize(context, 100))
                 else
                   SizedBox(
                     height: MediaQuery.of(context).viewInsets.bottom +
                         MediaQuery.of(context).size.height / 2.5,
                   ),
-                Container(
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      childAspectRatio: 1.1,
-                      mainAxisSpacing: 16.0,
-                      crossAxisSpacing: 20.0,
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    shrinkWrap: true,
-                    itemCount: 3,
-                    itemBuilder: (BuildContext context, int index) {
-                      IconData icon;
-                      String text;
-                      Color backgroundColor;
-                      Color borderColor;
-                      Color iconColor;
-                      Color textColor;
-                      if (index == selectedGridIndex) {
-                        backgroundColor = Colors.transparent;
-                        borderColor = const Color.fromRGBO(53, 85, 235, 1);
-                        iconColor = const Color.fromRGBO(53, 85, 235, 1);
-                        textColor = const Color.fromRGBO(53, 85, 235, 1);
-                      } else {
-                        backgroundColor = const Color(0xFFF2F4FF);
-                        borderColor = const Color(0xFFF2F4FF);
-                        iconColor = const Color(0xFF666791);
-                        textColor = const Color(0xFF666791);
-                      }
-                      if (index == 0) {
-                        icon = Icons.person;
-                        text = 'Student';
-                      } else if (index == 1) {
-                        icon = Icons.directions_bike;
-                        text = 'Bike';
-                      } else {
-                        icon = Icons.school;
-                        text = 'Department';
-                      }
-                      return GridItem(
-                        icon: icon,
-                        text: text,
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
-                        iconColor: iconColor,
-                        textColor: textColor,
-                        onTap: () {
-                          setState(() {
-                            selectedGridIndex = index;
-                          });
-                        },
-                      );
-                    },
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: EdgeInsets.only(
+                    bottom: isKeyboardOpen
+                        ? MediaQuery.of(context).viewInsets.bottom
+                        : 0,
                   ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      elevation: MaterialStateProperty.all<double>(15.0),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(9),
-                        ),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        isFormValid() && areAllGridsFilled()
-                            ? const Color.fromRGBO(53, 85, 235, 1)
-                            : Colors.grey,
-                      ),
-                    ),
-                    onPressed: isFormValid() && areAllGridsFilled()
-                        ? () {
-                            // Generate QR code
-                            String qrData = QRData(
-                              nameController.text,
-                              rollnoController.text,
-                              bikeController.text,
-                              vehicleController.text,
-                              selectedYear,
-                              selectedDepartment,
-                              selectedsection,
-                            );
-                            if (qrData.isNotEmpty) {
-                              // Show dialog box with QR code
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('QR Code'),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text('Your QR has been created:'),
-                                        const SizedBox(height: 10),
-                                        QrImageView(
-                                          data: qrData,
-                                          version: QrVersions.auto,
-                                          size: 200.0,
-                                        ),
-                                        const SizedBox(
-                                          width: double.infinity,
-                                        )
-                                      ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                  child: Column(
+                    children: [
+                      Container(
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 1.1,
+                            mainAxisSpacing: 16.0,
+                            crossAxisSpacing: 20.0,
+                          ),
+                          padding: const EdgeInsets.all(16.0),
+                          shrinkWrap: true,
+                          itemCount: 3,
+                          itemBuilder: (BuildContext context, int index) {
+                            IconData icon;
+                            String text;
+                            Color backgroundColor;
+                            Color borderColor;
+                            Color iconColor;
+                            Color textColor;
+                            if (index == selectedGridIndex) {
+                              backgroundColor = Colors.transparent;
+                              borderColor =
+                                  const Color.fromRGBO(53, 85, 235, 1);
+                              iconColor = const Color.fromRGBO(53, 85, 235, 1);
+                              textColor = const Color.fromRGBO(53, 85, 235, 1);
+                            } else {
+                              backgroundColor = const Color(0xFFF2F4FF);
+                              borderColor = const Color(0xFFF2F4FF);
+                              iconColor = const Color(0xFF666791);
+                              textColor = const Color(0xFF666791);
                             }
-                          }
-                        : null,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          'Generate QR',
-                          style: TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center,
+                            if (index == 0) {
+                              icon = Icons.person;
+                              text = 'Student';
+                            } else if (index == 1) {
+                              icon = Icons.directions_bike;
+                              text = 'Bike';
+                            } else {
+                              icon = Icons.school;
+                              text = 'Department';
+                            }
+                            return GridItem(
+                              icon: icon,
+                              text: text,
+                              backgroundColor: backgroundColor,
+                              borderColor: borderColor,
+                              iconColor: iconColor,
+                              textColor: textColor,
+                              onTap: () {
+                                setState(() {
+                                  selectedGridIndex = index;
+                                });
+                              },
+                            );
+                          },
                         ),
                       ),
-                    ),
-                  ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            elevation: MaterialStateProperty.all<double>(15.0),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(9),
+                              ),
+                            ),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              isFormValid() && areAllGridsFilled()
+                                  ? const Color.fromRGBO(53, 85, 235, 1)
+                                  : Colors.grey,
+                            ),
+                          ),
+                          onPressed: isFormValid() && areAllGridsFilled()
+                              ? () {
+                                  // Generate QR code
+                                  String qrData = QRData(
+                                    nameController.text,
+                                    rollnoController.text,
+                                    bikeController.text,
+                                    vehicleController.text,
+                                    selectedYear,
+                                    selectedDepartment,
+                                    selectedsection,
+                                  );
+                                  if (qrData.isNotEmpty) {
+                                    // Show dialog box with QR code
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('QR Code'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                  'Your QR has been created:'),
+                                              const SizedBox(height: 10),
+                                              QrImageView(
+                                                data: qrData,
+                                                version: QrVersions.auto,
+                                                size: 200.0,
+                                              ),
+                                              const SizedBox(
+                                                width: double.infinity,
+                                              )
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
+                                }
+                              : null,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Generate QR',
+                                style: TextStyle(fontSize: 16),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ), // Replace this with your widget.
                 ),
               ],
             ),
@@ -520,9 +549,7 @@ class _GenerateQRState extends State<GenerateQR> {
               ),
             ],
           ),
-          SizedBox(
-            height: getSize(context, 73)
-          )
+          SizedBox(height: getSize(context, 73))
         ],
       ),
     );
