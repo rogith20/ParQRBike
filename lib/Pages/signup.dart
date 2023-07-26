@@ -248,8 +248,8 @@ class _SignupPageState extends State<SignupPage> {
                     },
                   ),
                 ),
-                onPressed:
-                    signUp, // Call the signUp function when the button is pressed
+                onPressed: signUp,
+                // Call the signUp function when the button is pressed
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   child: SizedBox(
@@ -270,9 +270,6 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future signUp() async {
-    final isValid = _formKey.currentState!.validate();
-    if (!isValid) return;
-
     showDialog(
       context: context,
       barrierDismissible: false,
