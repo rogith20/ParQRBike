@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:park_qr/Utils/utils.dart';
 
 import 'homepage.dart';
@@ -11,7 +11,6 @@ class SignupPage extends StatefulWidget {
     Key? key,
     required this.onClickedSignIn,
   }) : super(key: key);
-
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -49,6 +48,7 @@ class _SignupPageState extends State<SignupPage> {
         _confirmPassword != null &&
         _confirmPassword!.isNotEmpty;
   }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -97,7 +97,7 @@ class _SignupPageState extends State<SignupPage> {
                     return 'Email is required';
                   }
                   final RegExp emailRegExp =
-                  RegExp(r'^[a-zA-Z\d.]+@[a-zA-Z\d]+\.[a-zA-Z]+');
+                      RegExp(r'^[a-zA-Z\d.]+@[a-zA-Z\d]+\.[a-zA-Z]+');
                   if (!emailRegExp.hasMatch(value)) {
                     return 'Please enter a valid email address';
                   }
@@ -136,7 +136,8 @@ class _SignupPageState extends State<SignupPage> {
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                   labelText: 'Create password',
-                  labelStyle: const TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                  labelStyle:
+                      const TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                   hintText: 'Shush! Don\'t say it out',
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   focusedBorder: const OutlineInputBorder(
@@ -184,7 +185,8 @@ class _SignupPageState extends State<SignupPage> {
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
                   labelText: 'Confirm password',
-                  labelStyle: const TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                  labelStyle:
+                      const TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                   hintText: 'Once more...',
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   focusedBorder: const OutlineInputBorder(
@@ -236,15 +238,18 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
+                    (Set<MaterialState> states) {
                       if (states.contains(MaterialState.disabled)) {
                         return Colors.grey; // Disabled color
                       }
-                      return isFormValid() ? const Color.fromRGBO(53, 85, 235, 1) : Colors.grey; // Enabled color
+                      return isFormValid()
+                          ? const Color.fromRGBO(53, 85, 235, 1)
+                          : Colors.grey; // Enabled color
                     },
                   ),
                 ),
-                onPressed: signUp, // Call the signUp function when the button is pressed
+                onPressed:
+                    signUp, // Call the signUp function when the button is pressed
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   child: SizedBox(
@@ -263,6 +268,7 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
+
   Future signUp() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) return;
@@ -278,9 +284,9 @@ class _SignupPageState extends State<SignupPage> {
         password: _passwordController.text.trim(),
       );
       Navigator.pop(context);
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const HomeScreen()));
-    }
-    on FirebaseAuthException catch (e) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const HomeScreen()));
+    } on FirebaseAuthException catch (e) {
       print(e);
       Utils.showSnackBar(e.message);
       Navigator.pop(context);

@@ -1,10 +1,12 @@
-import 'dart:io';
+import 'dart:ui' as ui;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:permission_handler/permission_handler.dart';
+
+import '../Utils/utils.dart';
 
 class ViewQR extends StatefulWidget {
   const ViewQR({Key? key}) : super(key: key);
@@ -14,6 +16,8 @@ class ViewQR extends StatefulWidget {
 }
 
 class _ViewQRState extends State<ViewQR> {
+  GlobalKey _globalKey = GlobalKey();
+
   // Dummy data for the grids, original data add pannanum
   final List<Map<String, String>> dummyData = [
     {
@@ -34,11 +38,10 @@ class _ViewQRState extends State<ViewQR> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Permission.photos.request();
-    Permission.storage.request();
+    PermissionUtil.requestAll();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +70,7 @@ class _ViewQRState extends State<ViewQR> {
           crossAxisSpacing: 20.0,
         ),
         padding: const EdgeInsets.all(16.0),
-        itemCount: dummyData.length,
+        itemCount: 1,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
             onTap: () {
@@ -86,13 +89,16 @@ class _ViewQRState extends State<ViewQR> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/qr_code.png',
-                    fit: BoxFit.contain,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height/7,
+                  RepaintBoundary(
+                    key: _globalKey,
+                    child: Image.asset(
+                      'assets/qr_code.png',
+                      fit: BoxFit.contain,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 7,
+                    ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height/280),
+                  SizedBox(height: MediaQuery.of(context).size.height / 280),
                   Flexible(
                     child: Text(
                       dummyData[index]['bikeModel']!,
@@ -120,6 +126,32 @@ class _ViewQRState extends State<ViewQR> {
         },
       ),
     );
+  }
+
+  _saveLocalImage() async {
+    RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage();
+    ByteData? byteData =
+        await (image.toByteData(format: ui.ImageByteFormat.png));
+    if (byteData != null) {
+      final result =
+          await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+      print(result);
+      Utils.toast(result.toString());
+    }
+  }
+
+  _saveNetworkImage() async {
+    var response = await Dio().get(
+        "https://ss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a62e824376d98d1069d40a31113eb807/838ba61ea8d3fd1fc9c7b6853a4e251f94ca5f46.jpg",
+        options: Options(responseType: ResponseType.bytes));
+    final result = await ImageGallerySaver.saveImage(
+        Uint8List.fromList(response.data),
+        quality: 60,
+        name: "hello");
+    print(result);
+    Utils.toast("$result");
   }
 
   void _showQRPopup(BuildContext context, Map<String, String> data) async {
@@ -153,6 +185,13 @@ class _ViewQRState extends State<ViewQR> {
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
+                onPressed: () async {
+                  _saveLocalImage();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('QR Downloaded Successfully'),
+                      duration: Duration(seconds: 1)));
+                },
                 style: ButtonStyle(
                   elevation: MaterialStateProperty.all<double>(15.0),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -161,7 +200,7 @@ class _ViewQRState extends State<ViewQR> {
                     ),
                   ),
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
+                    (Set<MaterialState> states) {
                       if (states.contains(MaterialState.disabled)) {
                         return Colors.grey; // Disabled color
                       }
@@ -170,39 +209,39 @@ class _ViewQRState extends State<ViewQR> {
                     },
                   ),
                 ),
-                onPressed: () async {
-                  try {
-                    // Get the QR code image
-                    final ByteData? byteData =
-                    await rootBundle.load('assets/qr_code.png');
-                    if (byteData == null) return;
-
-                    // Get the local directory path
-                    final directory = await getApplicationSupportDirectory();
-                    final imagePath =
-                        '${directory.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
-
-                    // Save the image to the local directory
-                    await File(imagePath)
-                        .writeAsBytes(byteData.buffer.asUint8List());
-
-                    // Check permission to access the gallery
-                    final PermissionStatus status =
-                    await Permission.photos.request();
-                    if (status.isGranted) {
-                      // Save the image to the gallery
-                      final result =
-                      await ImageGallerySaver.saveFile(imagePath);
-                      print('QR code saved: $result');
-                    } else {
-                      print('Permission denied');
-                    }
-                  } catch (e) {
-                    print('Error saving QR code: $e');
-                  }
-
-                  Navigator.of(context).pop();
-                },
+                // onPressed: () async {
+                //   try {
+                //     // Get the QR code image
+                //     final ByteData? byteData = await rootBundle
+                //         .load('https://picsum.photos/250?image=9');
+                //     if (byteData == null) return;
+                //
+                //     // Get the local directory path
+                //     final directory = await getApplicationSupportDirectory();
+                //     final imagePath =
+                //         '${directory.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png';
+                //
+                //     // Save the image to the local directory
+                //     await File(imagePath)
+                //         .writeAsBytes(byteData.buffer.asUint8List());
+                //
+                //     // Check permission to access the gallery
+                //     final PermissionStatus status =
+                //         await Permission.photos.request();
+                //     if (status.isGranted) {
+                //       // Save the image to the gallery
+                //       final result =
+                //           await ImageGallerySaver.saveFile(imagePath);
+                //       print('QR code saved: $result');
+                //     } else {
+                //       print('Permission denied');
+                //     }
+                //   } catch (e) {
+                //     print('Error saving QR code: $e');
+                //   }
+                //
+                //   Navigator.of(context).pop();
+                // },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   child: Container(
