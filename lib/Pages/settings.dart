@@ -1,7 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+import 'package:park_qr/Pages/generateqr.dart';
 import 'package:park_qr/Pages/login.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -35,7 +36,7 @@ class _SettingsState extends State<Settings> {
         padding: const EdgeInsets.all(18.0),
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            SizedBox(height: getSize(context, 10)),
             const Center(
               child: Text(
                 "Name",
@@ -45,7 +46,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
             ),
-            const SizedBox(height: 60),
+            SizedBox(height: getSize(context, 60)),
             Container(
               height: 60,
               width: MediaQuery.of(context).size.width,
@@ -96,7 +97,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: getSize(context, 20)),
             InkWell(
               onTap: () {
                 print('Logged Out');
@@ -122,7 +123,7 @@ class _SettingsState extends State<Settings> {
                 )),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: getSize(context, 20)),
             Container(
               height: MediaQuery.of(context).size.height / 2.19,
               width: MediaQuery.of(context).size.width,
@@ -141,8 +142,8 @@ class _SettingsState extends State<Settings> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
+                    SizedBox(height: getSize(context, 10)),
+                    Text(
                       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
                       'Maecenas maximus augue id elit ultrices varius. '
                       'Vestibulum ut nibh quis est venenatis semper. '
@@ -150,22 +151,22 @@ class _SettingsState extends State<Settings> {
                       'Nam semper eleifend risus, in sollicitudin lectus convallis non. '
                       'Nulla sed iaculis mi. Nulla facilisi.',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: getSize(context, 16),
                       ),
                       textAlign: TextAlign.justify,
                     ),
-                    const SizedBox(height: 80),
+                    SizedBox(height: getSize(context, 20)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset('assets/dummy_logo.png'),
-                        const SizedBox(width: 10),
+                        SizedBox(width: getSize(context, 10)),
                         const Text('X'),
-                        const SizedBox(width: 10),
+                        SizedBox(width: getSize(context, 10)),
                         Image.asset('assets/dgvc_logo.png')
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: getSize(context, 10)),
                     const Text(
                       'Initiative by \n   DDGDVC',
                       style: TextStyle(fontWeight: FontWeight.w300),
