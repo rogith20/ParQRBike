@@ -48,10 +48,10 @@ class _GenerateQRState extends State<GenerateQR> {
 
   int selectedGridIndex = 0;
 
-  String selectedYear = 'I';
+  String? selectedYear;
   List<String> years = ['I', 'II', 'III'];
 
-  String selectedDepartment = 'B.C.A';
+  String? selectedDepartment;
   List<String> departments = [
     'B.C.A',
     'B.Sc.',
@@ -62,7 +62,7 @@ class _GenerateQRState extends State<GenerateQR> {
     // ...
   ];
 
-  String selectedsection = 'A';
+  String? selectedsection;
   List<String> sections = ['A', 'B', 'C'];
 
   bool isFormValid() {
@@ -72,9 +72,13 @@ class _GenerateQRState extends State<GenerateQR> {
           nameController.text.isNotEmpty &&
           bikeController.text.isNotEmpty &&
           vehicleController.text.isNotEmpty &&
-          selectedYear.isNotEmpty &&
-          selectedDepartment.isNotEmpty &&
-          selectedsection.isNotEmpty;
+          selectedYear != null &&
+          selectedDepartment != null &&
+          selectedsection != null &&
+          selectedYear!.isNotEmpty &&
+          selectedDepartment!.isNotEmpty &&
+          selectedsection!.isNotEmpty;
+
     }
     return false;
   }
@@ -84,9 +88,13 @@ class _GenerateQRState extends State<GenerateQR> {
         rollnoController.text.isNotEmpty &&
         bikeController.text.isNotEmpty &&
         vehicleController.text.isNotEmpty &&
-        selectedYear.isNotEmpty &&
-        selectedDepartment.isNotEmpty &&
-        selectedsection.isNotEmpty;
+        selectedYear != null &&
+        selectedDepartment != null &&
+        selectedsection != null &&
+        selectedYear!.isNotEmpty &&
+        selectedDepartment!.isNotEmpty &&
+        selectedsection!.isNotEmpty;
+
   }
 
   String QRData(String name, String rollno, String bikeModel,
@@ -208,7 +216,7 @@ class _GenerateQRState extends State<GenerateQR> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                            horizontal: 15, vertical: 15),
                         child: ElevatedButton(
                           style: ButtonStyle(
                             elevation: MaterialStateProperty.all<double>(15.0),
@@ -232,11 +240,12 @@ class _GenerateQRState extends State<GenerateQR> {
                                     rollnoController.text,
                                     bikeController.text,
                                     vehicleController.text,
-                                    selectedYear,
-                                    selectedDepartment,
-                                    selectedsection,
+                                    selectedYear!,
+                                    selectedDepartment!,
+                                    selectedsection!,
                                   );
-                                  if (qrData.isNotEmpty) {
+                                  if (qrData != null && qrData.isNotEmpty)
+                                  {
                                     // Show dialog box with QR code
                                     showDialog(
                                       context: context,
@@ -465,11 +474,9 @@ class _GenerateQRState extends State<GenerateQR> {
                 child: DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Select Year',
-                    labelStyle:
-                        TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
@@ -478,15 +485,16 @@ class _GenerateQRState extends State<GenerateQR> {
                   value: selectedYear,
                   onChanged: (value) {
                     setState(() {
-                      selectedYear = value!;
+                      selectedYear = value;
                     });
                   },
-                  items: years.map((String department) {
-                    return DropdownMenuItem<String>(
-                      value: department,
-                      child: Text(department),
-                    );
-                  }).toList(),
+                  items: ['']
+                    ..addAll(years.map<DropdownMenuItem<String>>((String year) {
+                      return DropdownMenuItem<String>(
+                        value: year,
+                        child: Text(year),
+                      );
+                    }).toList()),
                 ),
               ),
               const SizedBox(width: 10),
@@ -494,11 +502,9 @@ class _GenerateQRState extends State<GenerateQR> {
                 child: DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Select Department',
-                    labelStyle:
-                        TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
@@ -507,10 +513,10 @@ class _GenerateQRState extends State<GenerateQR> {
                   value: selectedDepartment,
                   onChanged: (value) {
                     setState(() {
-                      selectedDepartment = value!;
+                      selectedDepartment = value;
                     });
                   },
-                  items: departments.map((String department) {
+                  items: departments.map<DropdownMenuItem<String>>((String department) {
                     return DropdownMenuItem<String>(
                       value: department,
                       child: Text(department),
@@ -523,11 +529,9 @@ class _GenerateQRState extends State<GenerateQR> {
                 child: DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Select Section',
-                    labelStyle:
-                        TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
@@ -536,20 +540,20 @@ class _GenerateQRState extends State<GenerateQR> {
                   value: selectedsection,
                   onChanged: (value) {
                     setState(() {
-                      selectedsection = value!;
+                      selectedsection = value;
                     });
                   },
-                  items: sections.map((String department) {
+                  items: sections.map<DropdownMenuItem<String>>((String section) {
                     return DropdownMenuItem<String>(
-                      value: department,
-                      child: Text(department),
+                      value: section,
+                      child: Text(section),
                     );
                   }).toList(),
                 ),
               ),
             ],
           ),
-          SizedBox(height: getSize(context, 73))
+          SizedBox(height: 88,)
         ],
       ),
     );

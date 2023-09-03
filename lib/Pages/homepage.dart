@@ -75,6 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 250.0),
+                        child: IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none_outlined,size: 35,)),
+                      ),
                       GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -86,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'assets/setting.png',
                             width: 30,
                             height: 30,
-                          ))
+                          )),
                     ],
                   ),
                   SizedBox(

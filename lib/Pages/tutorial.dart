@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Tutorial extends StatefulWidget {
-  const Tutorial({Key? key});
+  const Tutorial({super.key});
 
   @override
   State<Tutorial> createState() => _TutorialState();
@@ -17,7 +17,7 @@ class _TutorialState extends State<Tutorial> {
     // Initialize the YouTube video controller
     _controller = YoutubePlayerController(
       initialVideoId: 'dQw4w9WgXcQ',
-      flags: YoutubePlayerFlags(
+      flags: const YoutubePlayerFlags(
         autoPlay: true,
       ),
     );
@@ -34,7 +34,7 @@ class _TutorialState extends State<Tutorial> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: () {Navigator.pop(context);}, icon: Icon(Icons.arrow_back_ios,color: Colors.black,)),
+        leading: IconButton(onPressed: () {Navigator.pop(context);}, icon: const Icon(Icons.arrow_back_ios,color: Colors.black,)),
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Text('Tutorial',style: TextStyle(color: Colors.black),),
@@ -42,7 +42,7 @@ class _TutorialState extends State<Tutorial> {
       body: Column(
         children: [
           const SizedBox(height: 20),
-          Text(
+          const Text(
             'Tutorial Steps',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
@@ -50,7 +50,7 @@ class _TutorialState extends State<Tutorial> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
-              children: [
+              children: const [
                 StepItem(
                   stepNumber: 1,
                   title: 'Step 1: Lorem ipsum dolor sit amet',
@@ -80,7 +80,7 @@ class _TutorialState extends State<Tutorial> {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             'Video Tutorial',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
@@ -100,7 +100,7 @@ class StepItem extends StatelessWidget {
   final String title;
   final String description;
 
-  const StepItem({
+  const StepItem({super.key,
     required this.stepNumber,
     required this.title,
     required this.description,
@@ -110,12 +110,12 @@ class StepItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Color.fromRGBO(53, 85, 235, 1),
+        backgroundColor: const Color.fromRGBO(53, 85, 235, 1),
         child: Text(stepNumber.toString()),
       ),
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(description),
     );
