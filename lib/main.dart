@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:park_qr/Pages/homepage.dart';
-import 'package:park_qr/Pages/onboarding.dart';
-import 'Utils/auth_page.dart';
+
 import 'Pages/verify_email.dart';
+import 'Utils/auth_page.dart';
 import 'Utils/utils.dart';
 
 Future main() async {
@@ -19,6 +19,7 @@ Future main() async {
   ));
 }
 
+bool loading = false;
 final navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
@@ -45,5 +46,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-int mode=0; //mode? Colors.black : Colors.white
-
+int mode = 0; //mode? Colors.black : Colors.white

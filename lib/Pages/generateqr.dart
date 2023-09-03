@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:park_qr/main.dart';
+import 'package:park_qr/services/services_imp.dart';
+
+import '../services/services.dart';
 
 class GenerateQR extends StatefulWidget {
   const GenerateQR({Key? key}) : super(key: key);
@@ -15,10 +18,45 @@ double getSize(BuildContext context, double size) {
 }
 
 class _GenerateQRState extends State<GenerateQR> {
+  Services obj = new ServiceImp();
   TextEditingController nameController = TextEditingController();
   TextEditingController rollnoController = TextEditingController();
+  TextEditingController phnoController = TextEditingController();
   TextEditingController bikeController = TextEditingController();
   TextEditingController vehicleController = TextEditingController();
+  Future<void> _showAlertDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('QR Code'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('Your QR code'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   String? name;
 
   bool isKeyboardOpen = false;
@@ -48,10 +86,10 @@ class _GenerateQRState extends State<GenerateQR> {
 
   int selectedGridIndex = 0;
 
-  String? selectedYear;
+  String? selectedYear = 'I';
   List<String> years = ['I', 'II', 'III'];
 
-  String? selectedDepartment;
+  String? selectedDepartment = 'B.C.A';
   List<String> departments = [
     'B.C.A',
     'B.Sc.',
@@ -59,10 +97,9 @@ class _GenerateQRState extends State<GenerateQR> {
     'B.A',
     'M.C.A.',
     'M.B.A.',
-    // ...
   ];
 
-  String? selectedsection;
+  String? selectedsection = 'A';
   List<String> sections = ['A', 'B', 'C'];
 
   bool isFormValid() {
@@ -78,7 +115,6 @@ class _GenerateQRState extends State<GenerateQR> {
           selectedYear!.isNotEmpty &&
           selectedDepartment!.isNotEmpty &&
           selectedsection!.isNotEmpty;
-
     }
     return false;
   }
@@ -94,7 +130,6 @@ class _GenerateQRState extends State<GenerateQR> {
         selectedYear!.isNotEmpty &&
         selectedDepartment!.isNotEmpty &&
         selectedsection!.isNotEmpty;
-
   }
 
   String QRData(String name, String rollno, String bikeModel,
@@ -215,86 +250,108 @@ class _GenerateQRState extends State<GenerateQR> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 15),
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            elevation: MaterialStateProperty.all<double>(15.0),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(9),
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              isFormValid() && areAllGridsFilled()
-                                  ? const Color.fromRGBO(53, 85, 235, 1)
-                                  : Colors.grey,
-                            ),
-                          ),
-                          onPressed: isFormValid() && areAllGridsFilled()
-                              ? () {
-                                  // Generate QR code
-                                  String qrData = QRData(
-                                    nameController.text,
-                                    rollnoController.text,
-                                    bikeController.text,
-                                    vehicleController.text,
-                                    selectedYear!,
-                                    selectedDepartment!,
-                                    selectedsection!,
-                                  );
-                                  if (qrData != null && qrData.isNotEmpty)
-                                  {
-                                    // Show dialog box with QR code
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('QR Code'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Text(
-                                                  'Your QR has been created:'),
-                                              const SizedBox(height: 10),
-                                              QrImageView(
-                                                data: qrData,
-                                                version: QrVersions.auto,
-                                                size: 200.0,
-                                              ),
-                                              const SizedBox(
-                                                width: double.infinity,
-                                              )
-                                            ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 15),
+                          child: loading == false
+                              ? ElevatedButton(
+                                  style: ButtonStyle(
+                                    elevation:
+                                        MaterialStateProperty.all<double>(15.0),
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(9),
+                                      ),
+                                    ),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                      isFormValid() && areAllGridsFilled()
+                                          ? const Color.fromRGBO(53, 85, 235, 1)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  onPressed: isFormValid() &&
+                                          areAllGridsFilled()
+                                      ? () async {
+                                          setState(() {
+                                            loading = true;
+                                          });
+                                          await obj.newBike(
+                                              nameController.text.trim(),
+                                              rollnoController.text.trim(),
+                                              phnoController.text.trim(),
+                                              bikeController.text.trim(),
+                                              vehicleController.text.trim(),
+                                              selectedYear!,
+                                              selectedDepartment!,
+                                              selectedsection!);
+                                          // Generate QR code
+                                          String qrData = QRData(
+                                            nameController.text,
+                                            rollnoController.text,
+                                            bikeController.text,
+                                            vehicleController.text,
+                                            selectedYear!,
+                                            selectedDepartment!,
+                                            selectedsection!,
+                                          );
+                                          setState(() {
+                                            loading = false;
+                                          });
+
+                                          if (qrData != null &&
+                                              qrData.isNotEmpty &&
+                                              loading != true) {
+                                            print("kdjflsj");
+                                            // Show dialog box with QR code
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text('QR Code'),
+                                                  content: Container(
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        const Text(
+                                                            'Your QR has been created:'),
+                                                        const SizedBox(
+                                                            height: 10),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: const Text('OK'),
+                                                    ),
+                                                  ],
+                                                );
                                               },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                }
-                              : null,
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                'Generate QR',
-                                style: TextStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                                            );
+                                          }
+                                        }
+                                      : null,
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 15),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: Text(
+                                        'Generate QR',
+                                        style: TextStyle(fontSize: 16),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : CircularProgressIndicator(
+                                  color: Color.fromRGBO(53, 85, 235, 1))),
                     ],
                   ), // Replace this with your widget.
                 ),
@@ -375,6 +432,28 @@ class _GenerateQRState extends State<GenerateQR> {
             ),
             onChanged: (value) {},
             keyboardType: TextInputType.text,
+          ),
+          const SizedBox(height: 40),
+          TextFormField(
+            controller: phnoController,
+            decoration: const InputDecoration(
+              labelText: 'Enter your phone no.',
+              labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+              hintText: 'Phone no.',
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                ),
+              ),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+            onChanged: (value) {},
+            keyboardType: TextInputType.phone,
           ),
         ],
       ),
@@ -472,39 +551,41 @@ class _GenerateQRState extends State<GenerateQR> {
             children: [
               Flexible(
                 child: DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Select Year',
-                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                    decoration: const InputDecoration(
+                      labelText: 'Select Year',
+                      labelStyle:
+                          TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey),
-                    ),
-                  ),
-                  value: selectedYear,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedYear = value;
-                    });
-                  },
-                  items: ['']
-                    ..addAll(years.map<DropdownMenuItem<String>>((String year) {
+                    value: selectedYear,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedYear = value;
+                      });
+                    },
+                    items: years.map<DropdownMenuItem<String>>((String year) {
                       return DropdownMenuItem<String>(
                         value: year,
                         child: Text(year),
                       );
                     }).toList()),
-                ),
               ),
               const SizedBox(width: 10),
               Flexible(
                 child: DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Select Department',
-                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                    labelStyle:
+                        TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      borderSide:
+                          BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
@@ -516,7 +597,8 @@ class _GenerateQRState extends State<GenerateQR> {
                       selectedDepartment = value;
                     });
                   },
-                  items: departments.map<DropdownMenuItem<String>>((String department) {
+                  items: departments
+                      .map<DropdownMenuItem<String>>((String department) {
                     return DropdownMenuItem<String>(
                       value: department,
                       child: Text(department),
@@ -529,9 +611,11 @@ class _GenerateQRState extends State<GenerateQR> {
                 child: DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     labelText: 'Select Section',
-                    labelStyle: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+                    labelStyle:
+                        TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
+                      borderSide:
+                          BorderSide(color: Color.fromRGBO(53, 85, 235, 1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
@@ -543,7 +627,8 @@ class _GenerateQRState extends State<GenerateQR> {
                       selectedsection = value;
                     });
                   },
-                  items: sections.map<DropdownMenuItem<String>>((String section) {
+                  items:
+                      sections.map<DropdownMenuItem<String>>((String section) {
                     return DropdownMenuItem<String>(
                       value: section,
                       child: Text(section),
@@ -553,7 +638,9 @@ class _GenerateQRState extends State<GenerateQR> {
               ),
             ],
           ),
-          SizedBox(height: 88,)
+          SizedBox(
+            height: 88,
+          )
         ],
       ),
     );

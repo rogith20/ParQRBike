@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:park_qr/Pages/generateqr.dart';
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
         pageNo = 0;
       }
       pageController.animateToPage(pageNo,
-          duration:  const Duration(seconds: 1), curve: Curves.easeInOutCirc);
+          duration: const Duration(seconds: 1), curve: Curves.easeInOutCirc);
       pageNo++;
     });
   }
@@ -75,10 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 250.0),
-                        child: IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none_outlined,size: 35,)),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 250.0),
+                      //   child: IconButton(onPressed: () {}, icon: Icon(Icons.notifications_none_outlined,size: 35,)),
+                      // ),
                       GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -109,7 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             //padding: EdgeInsets.all(16),
                             width: MediaQuery.of(context).size.width,
                             margin: const EdgeInsets.all(2),
-                            child: Image.asset(imagePath,fit: BoxFit.fitWidth,),
+                            child: Image.asset(
+                              imagePath,
+                              fit: BoxFit.fitWidth,
+                            ),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12.5),
                             ),
@@ -184,7 +188,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (builder) => const ManageVehicles(vehicles: [],)));
+                                builder: (builder) => const ManageVehicles(
+                                      vehicles: [],
+                                    )));
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 25.0),

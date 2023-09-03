@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:park_qr/Utils/utils.dart';
+import 'package:park_qr/services/services.dart';
+import 'package:park_qr/services/services_imp.dart';
 
 import 'homepage.dart';
 
@@ -17,6 +19,7 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  Services obj = new ServiceImp();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -276,10 +279,8 @@ class _SignupPageState extends State<SignupPage> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+      await obj.insertUser(
+          _emailController.text.trim(), _passwordController.text.trim());
       Navigator.pop(context);
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => const HomeScreen()));
