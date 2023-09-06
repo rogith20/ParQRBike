@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:park_qr/Pages/qrview_page.dart';
 import 'package:park_qr/main.dart';
 import 'package:park_qr/services/services_imp.dart';
 
@@ -24,38 +25,6 @@ class _GenerateQRState extends State<GenerateQR> {
   TextEditingController phnoController = TextEditingController();
   TextEditingController bikeController = TextEditingController();
   TextEditingController vehicleController = TextEditingController();
-  Future<void> _showAlertDialog() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('QR Code'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text('Your QR code'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   String? name;
 
@@ -298,42 +267,26 @@ class _GenerateQRState extends State<GenerateQR> {
                                           setState(() {
                                             loading = false;
                                           });
-
                                           if (qrData != null &&
                                               qrData.isNotEmpty &&
                                               loading != true) {
-                                            print("kdjflsj");
-                                            // Show dialog box with QR code
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text('QR Code'),
-                                                  content: Container(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        const Text(
-                                                            'Your QR has been created:'),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      child: const Text('OK'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
+                                            setState(() {
+                                              loading = true;
+                                            });
+                                            obj.insertqr(
+                                                qrData,
+                                                bikeController.text.trim(),
+                                                vehicleController.text.trim());
+                                            setState(() {
+                                              loading = false;
+                                            });
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      QRCodeScreen(
+                                                        qrText: qrData,
+                                                      )),
                                             );
                                           }
                                         }

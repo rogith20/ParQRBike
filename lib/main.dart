@@ -6,16 +6,19 @@ import 'package:park_qr/Pages/homepage.dart';
 import 'Pages/verify_email.dart';
 import 'Utils/auth_page.dart';
 import 'Utils/utils.dart';
+import 'view_models/changes.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(fontFamily: 'Poppins'), //create dark theme
-    home: HomeScreen(),
-    scaffoldMessengerKey: messengerKey,
-    navigatorKey: navigatorKey,
+  runApp(Changes(
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Poppins'), //create dark theme
+      home: HomeScreen(),
+      scaffoldMessengerKey: messengerKey,
+      navigatorKey: navigatorKey,
+    ),
   ));
 }
 

@@ -25,7 +25,7 @@ class _$AppstateSerializer implements StructuredSerializer<Appstate> {
         ..add('qrs')
         ..add(serializers.serialize(value,
             specifiedType:
-                const FullType(List, const [const FullType(String)])));
+                const FullType(BuiltList, const [const FullType(Qrs)])));
     }
     return result;
   }
@@ -42,10 +42,10 @@ class _$AppstateSerializer implements StructuredSerializer<Appstate> {
       final Object? value = iterator.current;
       switch (key) {
         case 'qrs':
-          result.qrs = serializers.deserialize(value,
+          result.qrs.replace(serializers.deserialize(value,
                   specifiedType:
-                      const FullType(List, const [const FullType(String)]))
-              as List<String>?;
+                      const FullType(BuiltList, const [const FullType(Qrs)]))!
+              as BuiltList<Object?>);
           break;
       }
     }
@@ -56,7 +56,7 @@ class _$AppstateSerializer implements StructuredSerializer<Appstate> {
 
 class _$Appstate extends Appstate {
   @override
-  final List<String>? qrs;
+  final BuiltList<Qrs>? qrs;
 
   factory _$Appstate([void Function(AppstateBuilder)? updates]) =>
       (new AppstateBuilder()..update(updates))._build();
@@ -94,16 +94,16 @@ class _$Appstate extends Appstate {
 class AppstateBuilder implements Builder<Appstate, AppstateBuilder> {
   _$Appstate? _$v;
 
-  List<String>? _qrs;
-  List<String>? get qrs => _$this._qrs;
-  set qrs(List<String>? qrs) => _$this._qrs = qrs;
+  ListBuilder<Qrs>? _qrs;
+  ListBuilder<Qrs> get qrs => _$this._qrs ??= new ListBuilder<Qrs>();
+  set qrs(ListBuilder<Qrs>? qrs) => _$this._qrs = qrs;
 
   AppstateBuilder();
 
   AppstateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _qrs = $v.qrs;
+      _qrs = $v.qrs?.toBuilder();
       _$v = null;
     }
     return this;
@@ -124,7 +124,20 @@ class AppstateBuilder implements Builder<Appstate, AppstateBuilder> {
   Appstate build() => _build();
 
   _$Appstate _build() {
-    final _$result = _$v ?? new _$Appstate._(qrs: qrs);
+    _$Appstate _$result;
+    try {
+      _$result = _$v ?? new _$Appstate._(qrs: _qrs?.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'qrs';
+        _qrs?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'Appstate', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

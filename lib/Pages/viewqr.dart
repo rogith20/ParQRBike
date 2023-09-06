@@ -1,10 +1,16 @@
 import 'dart:ui' as ui;
 
+import 'package:built_collection/built_collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:park_qr/Pages/qrview_page.dart';
+import 'package:park_qr/models/qrs.dart';
+import 'package:park_qr/view_models/changes.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../Utils/utils.dart';
 
@@ -16,6 +22,24 @@ class ViewQR extends StatefulWidget {
 }
 
 class _ViewQRState extends State<ViewQR> {
+  Future<void> method() async {
+    await context.read<MyModel>().getdetails();
+    setState(() {});
+  }
+
+  Future<void> _refresh() async {
+    await context.read<MyModel>().getdetails();
+    setState(() {});
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    method();
+    setState(() {});
+  }
+
   GlobalKey _globalKey = GlobalKey();
 
   // Dummy data for the grids, original data add pannanum
@@ -36,14 +60,15 @@ class _ViewQRState extends State<ViewQR> {
 
   int? selectedGridIndex;
 
-  @override
-  void initState() {
-    super.initState();
-    PermissionUtil.requestAll();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   PermissionUtil.requestAll();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    BuiltList<Qrs>? list = context.read<MyModel>().state.qrs;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -70,14 +95,17 @@ class _ViewQRState extends State<ViewQR> {
           crossAxisSpacing: 20.0,
         ),
         padding: const EdgeInsets.all(16.0),
-        itemCount: 1,
+        itemCount: list!.length,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
             onTap: () {
-              setState(() {
-                selectedGridIndex = index;
-              });
-              _showQRPopup(context, dummyData[index]);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => QRCodeScreen(
+                          qrText: list[index].qrdata ?? "---",
+                        )),
+              );
             },
             child: Container(
               decoration: BoxDecoration(
@@ -89,19 +117,15 @@ class _ViewQRState extends State<ViewQR> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RepaintBoundary(
-                    key: _globalKey,
-                    child: Image.asset(
-                      'assets/qr_code.png',
-                      fit: BoxFit.contain,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 7,
-                    ),
+                  QrImageView(
+                    data: list[index]!.qrdata ?? "hello",
+                    version: QrVersions.auto,
+                    size: 100.0,
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height / 280),
                   Flexible(
                     child: Text(
-                      dummyData[index]['bikeModel']!,
+                      list[index].bike ?? "---",
                       style: const TextStyle(
                         fontSize: 12.0,
                         fontWeight: FontWeight.bold,
@@ -113,7 +137,7 @@ class _ViewQRState extends State<ViewQR> {
                   const SizedBox(height: 2.0),
                   Flexible(
                     child: Text(
-                      dummyData[index]['vehicleNumber']!,
+                      list[index].bikeno ?? "---",
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 10),
