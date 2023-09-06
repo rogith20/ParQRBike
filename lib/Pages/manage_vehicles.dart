@@ -1,4 +1,9 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/qrs.dart';
+import '../view_models/changes.dart';
 
 class ManageVehicles extends StatefulWidget {
   const ManageVehicles({Key? key, required List vehicles}) : super(key: key);
@@ -8,42 +13,66 @@ class ManageVehicles extends StatefulWidget {
 }
 
 class _ManageVehiclesState extends State<ManageVehicles> {
-  List<Vehicle> vehicles = [
+  Future<void> method() async {
+    await context.read<MyModel>().getdetails();
+    setState(() {});
+  }
 
-  ];
+  Future<void> _refresh() async {
+    await context.read<MyModel>().getdetails();
+    setState(() {});
+    return null;
+  }
 
   @override
+  void initState() {
+    super.initState();
+    method();
+    setState(() {});
+  }
+
+  List<Vehicle> vehicles = [];
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Manage your Vehicles',
-          style: TextStyle(color: Colors.black),
+    BuiltList<Qrs>? list = context.read<MyModel>().state.qrs;
+
+    return RefreshIndicator(
+      onRefresh: () {
+        _refresh();
+        return Future(() => null);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Manage your Vehicles',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
+        body: ListView.builder(
+          itemCount: list!.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(list[index]!.bike ?? "",
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(list[index]!.bike ?? ""),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete,
+                    color: Color.fromRGBO(53, 85, 235, 1)),
+                onPressed: () {
+                  showDeleteConfirmationDialog(context, index);
+                },
+              ),
+            );
           },
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
         ),
-      ),
-      body: ListView.builder(
-        itemCount: vehicles.length,
-        itemBuilder: (context, index) {
-          final vehicle = vehicles[index];
-          return ListTile(
-            title: Text(vehicle.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(vehicle.number),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Color.fromRGBO(53, 85, 235, 1)),
-              onPressed: () {
-                showDeleteConfirmationDialog(context, index);
-              },
-            ),
-          );
-        },
       ),
     );
   }
@@ -60,7 +89,8 @@ class _ManageVehiclesState extends State<ManageVehicles> {
     });
   }
 
-  Future<void> showDeleteConfirmationDialog(BuildContext context, int index) async {
+  Future<void> showDeleteConfirmationDialog(
+      BuildContext context, int index) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -72,14 +102,20 @@ class _ManageVehiclesState extends State<ManageVehicles> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel',style: TextStyle(color: Colors.red),),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
             TextButton(
               onPressed: () {
                 deleteVehicle(index);
                 Navigator.of(context).pop();
               },
-              child: const Text('Delete',style: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Color.fromRGBO(53, 85, 235, 1)),
+              ),
             ),
           ],
         );
@@ -94,4 +130,3 @@ class Vehicle {
 
   Vehicle({required this.name, required this.number});
 }
-

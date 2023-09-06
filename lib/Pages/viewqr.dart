@@ -42,112 +42,91 @@ class _ViewQRState extends State<ViewQR> {
 
   GlobalKey _globalKey = GlobalKey();
 
-  // Dummy data for the grids, original data add pannanum
-  final List<Map<String, String>> dummyData = [
-    {
-      'bikeModel': 'Royal Enfield Classic 350',
-      'vehicleNumber': 'TN06DE1234',
-    },
-    {
-      'bikeModel': 'Bajaj Pulsar NS 200',
-      'vehicleNumber': 'KL04AA000',
-    },
-    {
-      'bikeModel': 'Suzuki Access 125',
-      'vehicleNumber': 'TN09EF5420',
-    },
-  ];
-
-  int? selectedGridIndex;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   PermissionUtil.requestAll();
-  // }
-
   @override
   Widget build(BuildContext context) {
     BuiltList<Qrs>? list = context.read<MyModel>().state.qrs;
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          'View your QRs',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
+    return RefreshIndicator(
+      onRefresh: () {
+        _refresh();
+        return Future(() => null);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          title: const Text(
+            'View your QRs',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
           ),
         ),
-      ),
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.9,
-          mainAxisSpacing: 20.0,
-          crossAxisSpacing: 20.0,
-        ),
-        padding: const EdgeInsets.all(16.0),
-        itemCount: list!.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => QRCodeScreen(
-                          qrText: list[index].qrdata ?? "---",
-                        )),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                color: selectedGridIndex == index
-                    ? Colors.indigoAccent.withOpacity(0.3)
-                    : Colors.grey.withOpacity(0.3),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  QrImageView(
-                    data: list[index]!.qrdata ?? "hello",
-                    version: QrVersions.auto,
-                    size: 100.0,
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height / 280),
-                  Flexible(
-                    child: Text(
-                      list[index].bike ?? "---",
-                      style: const TextStyle(
-                        fontSize: 12.0,
-                        fontWeight: FontWeight.bold,
+        body: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.9,
+            mainAxisSpacing: 20.0,
+            crossAxisSpacing: 20.0,
+          ),
+          padding: const EdgeInsets.all(16.0),
+          itemCount: list!.length,
+          itemBuilder: (BuildContext context, int index) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => QRCodeScreen(
+                            qrText: list[index].qrdata ?? "---",
+                          )),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    color: Colors.indigoAccent.withOpacity(0.3)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    QrImageView(
+                      data: list[index]!.qrdata ?? "hello",
+                      version: QrVersions.auto,
+                      size: 100.0,
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height / 280),
+                    Flexible(
+                      child: Text(
+                        list[index].bike ?? "---",
+                        style: const TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(height: 2.0),
-                  Flexible(
-                    child: Text(
-                      list[index].bikeno ?? "---",
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 10),
+                    const SizedBox(height: 2.0),
+                    Flexible(
+                      child: Text(
+                        list[index].bikeno ?? "---",
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 10),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
